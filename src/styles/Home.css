@@ -1,0 +1,60 @@
+.no-border{
+    border: 0px;
+}
+
+/* Navigation hover effects */
+.nav-hover {
+    transition: all 0.2s ease-in-out;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+}
+
+.nav-hover:hover {
+    background-color: #e9ecef !important;
+    color: #0d6efd !important;
+    transform: translateX(4px);
+}
+
+.nav-hover.active {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+
+.nav-hover.active:hover {
+    background-color: #0b5ed7 !important;
+    transform: translateX(4px);
+}
+
+/* Sticky Orders Component */
+.sticky-container {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
+    min-height: 100vh;
+}
+
+.sticky-content {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Custom scrollbar for sticky content */
+.sticky-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sticky-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.sticky-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.sticky-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

@@ -16,12 +16,58 @@ const AddItemForm = ({ onClose, onAddItem }) => {
 
   
   const categories = [
-    "Sparkels",
-    "Flower Pots",
-    "Multi Shots",
-    "Rockets",
-    "Bombs",
+    "SPARKLERS",
+    "FLOWER POTS",
+    "GROUND CHAKKARS",
+    "KIDS FANCY",
+    "BOMBS",
+    "ROCKETS",
+    "GARLANDS",
+    "FANCY SHOTS",
+    "MULTIPILE SHOTS",
+    "SEPECIAL MULTIPILE SHOTS",
   ];
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (validateForm()) {
+    const form = new FormData();
+    form.append('productId', Date.now()); // or generate as needed
+    form.append('productName', formData.name);
+    form.append('brandName', formData.brand);
+    form.append('orignalPrice', formData.price);
+    form.append('discountPrice', formData.discountPrice || 0);
+    form.append('category', formData.category);
+    if (formData.image) {
+      form.append('files', formData.image); // "files" matches backend FilesInterceptor('files')
+    }
+
+    try {
+      const response = await fetch('https://cracker-backend-0iz6.onrender.com/products', {
+        method: 'POST',
+        headers: {
+          // Do NOT set Content-Type here; browser will set it with boundary for FormData
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}` // Adjust token retrieval as needed
+        },
+        body: form,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setErrors({ api: errorData.message || 'Failed to add item' });
+        return;
+      }
+
+      const itemData = await response.json();
+      onAddItem(itemData);
+      console.log("Item added successfully");
+      onClose();
+    } catch (error) {
+      setErrors({ api: 'Network error. Please try again.' });
+    }
+  }
+};
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -52,10 +98,10 @@ const AddItemForm = ({ onClose, onAddItem }) => {
       }
 
       // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 1 * 1024 * 1024) {
         setErrors(prev => ({
           ...prev,
-          image: 'Image size should be less than 5MB'
+          image: 'Image size should be less than 1MB'
         }));
         return;
       }
@@ -107,30 +153,15 @@ const AddItemForm = ({ onClose, onAddItem }) => {
       newErrors.discountPrice = 'Discount price must be less than original price';
     }
 
-    if (!formData.image) {
-      newErrors.image = 'Image is required';
-    }
+   // if (!formData.image) {
+   //   newErrors.image = 'Image is required';
+   // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      const itemData = {
-        ...formData,
-        id: Date.now(), // Simple ID generation
-        price: parseFloat(formData.price),
-        discountPrice: formData.discountPrice ? parseFloat(formData.discountPrice) : null
-      };
-      
-      onAddItem(itemData);
-      onClose();
-    }
-  };
-
+  
+  
   const handleClose = () => {
     setFormData({
       name: '',
@@ -169,7 +200,7 @@ const AddItemForm = ({ onClose, onAddItem }) => {
                 {/* Item Name */}
                 <div className="col-md-6 mb-3">
                   <label htmlFor="name" className="form-label">
-                    Item Name <span className="text-danger">*</span>
+                    Product Name <span className="text-danger">*</span>
                   </label>
                   <input
                     type="text"
@@ -275,12 +306,12 @@ const AddItemForm = ({ onClose, onAddItem }) => {
                     className={`form-control ${errors.image ? 'is-invalid' : ''}`}
                     id="image"
                     name="image"
-                    accept="image/*"
+                    accept=".jpg, .jpeg,"
                     onChange={handleImageChange}
                   />
                   {errors.image && <div className="invalid-feedback">{errors.image}</div>}
                   <div className="form-text">
-                    Supported formats: JPG, PNG, GIF. Max size: 5MB
+                    Supported formats: JPG, JPEG. Max size: 1MB
                   </div>
                 </div>
 
@@ -312,7 +343,7 @@ const AddItemForm = ({ onClose, onAddItem }) => {
               <button
                 type="submit"
                 className="btn btn-primary"
-                on
+                onClick={handleSubmit}
               >
                 <Plus className="me-2" size={16} />
                 Add Item

@@ -86,7 +86,7 @@ const DistributorSignin = () => {
               )}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
+                  <label className="form-label">Email Address</label>
                   <input
                     type="email"
                     className="form-control"
@@ -112,13 +112,6 @@ const DistributorSignin = () => {
                 <div className="d-grid gap-2">
                   <button className="btn btn-primary" type="submit" disabled={submitting}>
                     {submitting ? "Signing in..." : "Sign in"}
-                  </button>
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => navigate("/signup")}
-                  >
-                    New here? Create an account
                   </button>
                 </div>
               </form>

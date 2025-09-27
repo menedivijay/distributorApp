@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import {  useState } from 'react';
 import { Plus, Package, Edit, Trash2 } from 'lucide-react';
 import AddItemForm from './AddItemForm';
 import EditItemForm from './EditItemForm';
@@ -18,14 +18,6 @@ const Menu = () => {
     console.log('New item added:', newItem);
   };
 
-  // const productsLoad=()=>{
-
-  // }
-
-  // useEffect(()=>{
-  //   setItems(prevItems => [...prevItems, newItem]);
-  // },[])
-
   const handleShowAddForm = () => {
     setShowAddForm(true);
   };
@@ -43,8 +35,8 @@ const Menu = () => {
       )
     );
   };
-
-
+ 
+  
 
   const handleEditItem = (id) => {
     const itemToEdit = items.find(item => item.id === id);
@@ -85,6 +77,20 @@ const Menu = () => {
             <Package className="me-2" size={20} />
             Menu Management
           </h5>
+         <div>
+          <button
+            className="btn btn-outline-secondary me-2"
+            type="button"
+            onClick={() => document.getElementById('csv-upload-input').click()}
+          > <input
+            id="csv-upload-input"
+            type="file"
+            accept=".xlsx, .csv, .xls, .xlsm , .xlsb"
+            style={{ display: 'none' }}
+          />
+            Import CSV
+          </button>
+
           <button
             className="btn btn-primary"
             onClick={handleShowAddForm}
@@ -92,6 +98,8 @@ const Menu = () => {
             <Plus className="me-2" size={16} />
             Add Item
           </button>
+          </div>
+
         </div>
       </div>
 
@@ -171,12 +179,12 @@ const Menu = () => {
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <span className="fw-bold">₹{item.price.toFixed(2)}</span>
+                        {/*<td>
+                          <span className="fw-bold">₹{item.price.toFixed(0)}</span>
                         </td>
                         <td>
-                          <span className="fw-bold text-success">₹{item.discountPrice.toFixed(2)}</span>
-                        </td>
+                          <span className="fw-bold text-success">₹{item.discountPrice.toFixed(0)}</span>
+                        </td>*/}
                         <td>
                           <div className="d-flex align-items-center">
                             <div className="form-check form-switch">

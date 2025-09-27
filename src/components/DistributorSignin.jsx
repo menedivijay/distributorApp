@@ -64,7 +64,7 @@ const DistributorSignin = () => {
       if (user) {
         try { localStorage.setItem("user", JSON.stringify(user)); } catch {}
       }
-      navigate("/");
+      navigate("/products");
     } catch (err) {
       setError(err.message || "Signin failed");
     } finally {

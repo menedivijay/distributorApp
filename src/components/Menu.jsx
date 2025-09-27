@@ -1,4 +1,4 @@
-import {  useState } from 'react';
+import {  useEffect, useState } from 'react';
 import { Plus, Package, Edit, Trash2 } from 'lucide-react';
 import AddItemForm from './AddItemForm';
 import EditItemForm from './EditItemForm';
@@ -7,9 +7,57 @@ const Menu = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [items, setItems] = useState([
-     
-  ]);
+  const [items, setItems] = useState([]);
+
+  // NEW STATES
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchItems = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const url = new URL("https://cracker-backend-0iz6.onrender.com/products");
+        if (searchTerm && searchTerm.trim().length > 0) {
+          url.searchParams.append("keyword", searchTerm.trim());
+        }
+        url.searchParams.append("page", String(page));
+
+        const response = await fetch(url.toString(), { signal: controller.signal });
+        if (!response.ok) throw new Error("Failed to fetch products");
+
+        const data = await response.json();
+
+        const mappedItems = (Array.isArray(data) ? data : []).map((item) => ({
+          id: item._id,
+          name: item.productName,
+          brand: item.brandName,
+          category: item.category,
+          price: item.orignalPrice,
+          discountPrice: item.discountPrice,
+          image: item.images[0].Location,
+          status: "active",
+        }));
+        setItems(mappedItems);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message || "Unknown error");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+    return () => controller.abort();
+  }, [searchTerm, page]);
+
 
 
   const handleAddItem = (newItem) => {
@@ -26,7 +74,7 @@ const Menu = () => {
     setShowAddForm(false);
   };
 
-  const handleToggleStatus = (id) => {
+  /*const handleToggleStatus = (id) => {
     setItems(prevItems =>
       prevItems.map(item =>
         item.id === id
@@ -34,9 +82,9 @@ const Menu = () => {
           : item
       )
     );
-  };
+  };*/
  
-  
+  console.log(items);
 
   const handleEditItem = (id) => {
     const itemToEdit = items.find(item => item.id === id);
@@ -45,6 +93,7 @@ const Menu = () => {
       setShowEditForm(true);
     }
   };
+
 
   const handleUpdateItem = (updatedItem) => {
     setItems(prevItems =>
@@ -64,10 +113,6 @@ const Menu = () => {
     setItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
-  // Calculate summary statistics
-  const totalItems = items.length;
-  const activeItems = items.filter(item => item.status === 'active').length;
-  const inactiveItems = items.filter(item => item.status === 'inactive').length;
 
   return (
     <div>
@@ -75,7 +120,7 @@ const Menu = () => {
         <div className="container-fluid d-flex justify-content-between align-items-center py-3 px-3">
           <h5 className="mb-0">
             <Package className="me-2" size={20} />
-            Menu Management
+            Products
           </h5>
          <div>
           <button
@@ -104,102 +149,70 @@ const Menu = () => {
       </div>
 
       <div className="container-fluid py-4">
-        {/* Summary Cards */}
-        <div className="row mb-4 mx-5">
-          <div className="col-md-4 mb-3">
-            <div className="card bg-white shadow-sm">
-              <div className="card-body text-center">
-                <h6 className="card-title text-muted mb-2">Total Items</h6>
-                <h3 className="mb-0 text-primary">{totalItems}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card bg-white shadow-sm">
-              <div className="card-body text-center">
-                <h6 className="card-title text-muted mb-2">Active</h6>
-                <h3 className="mb-0 text-success">{activeItems}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card bg-white shadow-sm">
-              <div className="card-body text-center">
-                <h6 className="card-title text-muted mb-2">Inactive</h6>
-                <h3 className="mb-0 text-danger">{inactiveItems}</h3>
-              </div>
-            </div>
+        <div className="row mb-3 mx-3">
+          <div className="col-md-6">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search product Name..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value,);
+
+                setPage(1); // reset to page 1
+              }}
+            />
           </div>
         </div>
+        
 
         {/* Menu Items Table */}
         <div className="card bg-white shadow-sm mx-3">
-          <div className="card-header bg-white border-bottom">
-            <h5 className="mb-0">Menu Items</h5>
+          <div className="card-header bg-secondary border-bottom">
+            <h5 className="mb-0 text-white">MY PRODUCTS</h5>
           </div>
           <div className="card-body p-0">
-            {items.length === 0 ? (
+            {loading && <div className="text-center py-4">Loading...</div>}
+            {error && <div className="text-center py-4 text-danger">{error}</div>}
+
+            {!loading && !error && items.length === 0 && (
               <div className="text-center py-5">
                 <Package size={64} className="text-muted mb-3" />
-                <h5 className="text-muted">No items added yet</h5>
-                <p className="text-muted">Click "Add Item" to start adding products to your menu</p>
+                <h5 className="text-muted">No items found</h5>
+                <p className="text-muted">Try adjusting your search or add a new item</p>
               </div>
-            ) : (
-              <div className="table-responsive">
+            )}
+
+            {!loading && !error && items.length > 0 && (
+              <div className='table-responsive' style={{maxHeight: '410px', overflowY: 'auto', overflowX: 'auto'}}>
                 <table className="table table-hover mb-0">
-                  <thead className="table-light">
+                  <thead className="table-light position-sticky top-0" >
                     <tr>
-                      <th className="border-0 ps-4">Item ID</th>
-                      <th className="border-0 ps-4">Name</th>
-                      <th className="border-0">Price</th>
+                      <th className="border-0 ps-4">Product Name</th>
+                      <th className="border-0 ps-4">Brand</th>
+                      <th className="border-0 ps-4">Category</th>
+                      <th className="border-0">MRP Price</th>
                       <th className="border-0">Discount Price</th>
-                      <th className="border-0">Status</th>
                       <th className="border-0 pe-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.map((item) => (
                       <tr key={item.id}>
-                        <td>
-                          <span className="fw-bold">{item.id}</span>
+                        <td className="ps-4">
+                          <span className="fw-bold">{item.name}</span>  
                         </td>
                         <td className="ps-4">
-                          <div className="d-flex align-items-center">
-                            {item.imagePreview && (
-                              <img
-                                src={item.imagePreview}
-                                alt={item.name}
-                                className="rounded me-3"
-                                style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                              />
-                            )}
-                            <div>
-                              <h6 className="mb-0">{item.name}</h6>
-                              <small className="text-muted">{item.brand}</small>
-                            </div>
-                          </div>
+                          <span className="fw-small">{item.brand}</span>
                         </td>
-                        {/*<td>
-                          <span className="fw-bold">₹{item.price.toFixed(0)}</span>
+                        <td className="ps-4">
+                          <span className="fw-small">{item.category}</span>
                         </td>
                         <td>
-                          <span className="fw-bold text-success">₹{item.discountPrice.toFixed(0)}</span>
-                        </td>*/}
+                          <span className="fw-bold">₹{item.price}</span>
+                        </td>
                         <td>
-                          <div className="d-flex align-items-center">
-                            <div className="form-check form-switch">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={item.status === 'active'}
-                                onChange={() => handleToggleStatus(item.id)}
-                                style={{ transform: 'scale(1.2)' }}
-                              />
-                            </div>
-                            <span className={`ms-2 small ${item.status === 'active' ? 'text-success' : 'text-muted'}`}>
-                              {item.status}
-                            </span>
-                          </div>
+                          <span className="fw-bold text-success">₹{item.discountPrice}</span>
                         </td>
                         <td className="pe-4">
                           <div className="d-flex gap-2">
@@ -229,6 +242,27 @@ const Menu = () => {
             )}
           </div>
         </div>
+        
+        {/* Pagination */}
+        {!loading && !error && items.length > 0 && (
+          <div className="d-flex justify-content-center align-items-center gap-2 py-3">
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Prev
+            </button>
+            <span className="small">Page {page}</span>
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              disabled={items.length < 15} // backend page size 15
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {showAddForm && (
@@ -248,5 +282,5 @@ const Menu = () => {
     </div>
   );
 };
-  
-  export default Menu;
+
+export default Menu;

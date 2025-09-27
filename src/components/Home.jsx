@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { List, Box, People, BarChart } from "react-bootstrap-icons"; // Bootstrap icons
 import "../styles/Home.css";
 const navItems = [
-  { href: "/", label: "Menu", icon: <List size={18} /> },
+  { href: "/", label: "Products", icon: <List size={18} /> },
   { href: "/orders", label: "Orders", icon: <Box size={18} /> },
   { href: "/agents", label: "Agents", icon: <People size={18} /> },
   { href: "/reports", label: "Reports", icon: <BarChart size={18} /> },

@@ -9,8 +9,8 @@ const EditItemForm = ({ item, onClose, onUpdateItem }) => {
     price: '',
     discountPrice: '',
     status: 'active',
-    image: null,
-    imagePreview: null
+    image:" ",
+    imagePreview:" ",
   });
 
   const [errors, setErrors] = useState({});
@@ -33,8 +33,8 @@ const EditItemForm = ({ item, onClose, onUpdateItem }) => {
         price: item.price ? item.price.toString() : '',
         discountPrice: item.discountPrice ? item.discountPrice.toString() : '',
         status: item.status || 'active',
-        image: item.image || null,
-        imagePreview: item.imagePreview || null
+        image: item.image || " ",
+        imagePreview: item.image || " ",
       });
     }
   }, [item]);
@@ -147,7 +147,8 @@ const EditItemForm = ({ item, onClose, onUpdateItem }) => {
     setErrors({});
     onClose();
   };
-
+  
+  console.log(formData.image);
   return (
     <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-lg">
@@ -168,7 +169,7 @@ const EditItemForm = ({ item, onClose, onUpdateItem }) => {
                 <div className="col-12 mb-4">
                   <label className="form-label">Product Image</label>
                   <div className="d-flex align-items-center gap-3">
-                    {formData.imagePreview ? (
+                    {formData.image? (
                       <div className="position-relative">
                         <img
                           src={formData.imagePreview}
